@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 import { mapAsync } from 'payload'
 import { wait } from 'payload/shared'
-import qs from 'qs'
+import * as qs from 'qs-esm'
 
 import type { Config, Geo, Post } from '../../payload-types.js'
 
@@ -67,7 +67,7 @@ describe('admin2', () => {
       snapshotKey: 'adminTests2',
     })
 
-    await ensureAutoLoginAndCompilationIsDone({ page, serverURL, customAdminRoutes })
+    await ensureAutoLoginAndCompilationIsDone({ customAdminRoutes, page, serverURL })
 
     adminRoutes = getAdminRoutes({ customAdminRoutes })
   })
@@ -77,7 +77,7 @@ describe('admin2', () => {
       snapshotKey: 'adminTests2',
     })
 
-    await ensureAutoLoginAndCompilationIsDone({ page, serverURL, customAdminRoutes })
+    await ensureAutoLoginAndCompilationIsDone({ customAdminRoutes, page, serverURL })
   })
 
   describe('custom CSS', () => {
@@ -149,6 +149,23 @@ describe('admin2', () => {
 
         await page.locator('.search-filter__input').fill('this is fun')
         await expect(page.locator(tableRowLocator)).toHaveCount(1)
+      })
+
+      test('search should not persist between navigation', async () => {
+        const url = `${postsUrl.list}?limit=10&page=1&search=test`
+        await page.goto(url)
+        await page.waitForURL(url)
+
+        await expect(page.locator('#search-filter-input')).toHaveValue('test')
+
+        await page.locator('.nav-toggler.template-default__nav-toggler').click()
+        await expect(page.locator('#nav-uploads')).toContainText('Uploads')
+
+        const uploadsUrl = await page.locator('#nav-uploads').getAttribute('href')
+        await page.goto(serverURL + uploadsUrl)
+        await page.waitForURL(serverURL + uploadsUrl)
+
+        await expect(page.locator('#search-filter-input')).toHaveValue('')
       })
 
       test('should toggle columns', async () => {
@@ -267,8 +284,8 @@ describe('admin2', () => {
         const tableRows = page.locator(tableRowLocator)
 
         await expect(tableRows).toHaveCount(1)
-        const firstId = await page.locator(tableRowLocator).first().locator('.cell-id').innerText()
-        expect(firstId).toEqual(`ID: ${id}`)
+        const firstId = page.locator(tableRowLocator).first().locator('.cell-id')
+        await expect(firstId).toHaveText(`ID: ${id}`)
 
         // Remove filter
         await page.locator('.condition__actions-remove').click()

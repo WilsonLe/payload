@@ -18,6 +18,7 @@ export const huTranslations: DefaultTranslationsObject = {
     confirmPassword: 'Jelszó megerősítése',
     createFirstUser: 'Első felhasználó létrehozása',
     emailNotValid: 'A megadott e-mail cím érvénytelen',
+    emailOrUsername: 'E-mail vagy Felhasználónév',
     emailSent: 'E-mail elküldve',
     emailVerified: 'Az email sikeresen megerősítve.',
     enableAPIKey: 'API-kulcs engedélyezése',
@@ -298,6 +299,7 @@ export const huTranslations: DefaultTranslationsObject = {
     updating: 'Frissítés',
     uploading: 'Feltöltés',
     user: 'Felhasználó',
+    username: 'Felhasználónév',
     users: 'Felhasználók',
     value: 'Érték',
     welcome: 'Üdvözöljük',
@@ -319,6 +321,7 @@ export const huTranslations: DefaultTranslationsObject = {
     within: 'belül',
   },
   upload: {
+    addFile: 'Fájl hozzáadása',
     crop: 'Termés',
     cropToolDescription:
       'Húzza a kijelölt terület sarkait, rajzoljon új területet, vagy igazítsa a lentebb található értékeket.',
@@ -333,6 +336,7 @@ export const huTranslations: DefaultTranslationsObject = {
     height: 'Magasság',
     lessInfo: 'Kevesebb információ',
     moreInfo: 'További információ',
+    pasteURL: 'URL beillesztése',
     previewSizes: 'Előnézeti méretek',
     selectCollectionToBrowse: 'Válassza ki a böngészni kívánt gyűjteményt',
     selectFile: 'Válasszon ki egy fájlt',
@@ -362,6 +366,8 @@ export const huTranslations: DefaultTranslationsObject = {
     shorterThanMax:
       'Ennek az értéknek rövidebbnek kell lennie, mint a maximálisan megengedett {{maxLength}} karakter.',
     trueOrFalse: 'Ez a mező csak igaz vagy hamis lehet.',
+    username:
+      'Adjon meg egy érvényes felhasználónevet. Tartalmazhat betűket, számokat, kötőjeleket, pontokat és aláhúzásokat.',
     validUploadID: 'Ez a mező nem érvényes feltöltési azonosító.',
   },
   version: {
@@ -387,12 +393,15 @@ export const huTranslations: DefaultTranslationsObject = {
     confirmUnpublish: 'A közzététel visszavonásának megerősítése',
     confirmVersionRestoration: 'Verzió-visszaállítás megerősítése',
     currentDocumentStatus: 'Jelenlegi {{docStatus}} dokumentum',
+    currentDraft: 'Aktuális tervezet',
+    currentPublishedVersion: 'Jelenleg Közzétett Verzió',
     draft: 'Piszkozat',
     draftSavedSuccessfully: 'A piszkozat sikeresen mentve.',
     lastSavedAgo: 'Utoljára mentve {{distance}} órája',
     noFurtherVersionsFound: 'További verziók nem találhatók',
     noRowsFound: 'Nem található {{label}}',
     preview: 'Előnézet',
+    previouslyPublished: 'Korábban Közzétéve',
     problemRestoringVersion: 'Hiba történt a verzió visszaállításakor',
     publish: 'Közzététel',
     publishChanges: 'Módosítások közzététele',

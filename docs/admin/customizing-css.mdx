@@ -1,7 +1,7 @@
 ---
 title: Customizing CSS & SCSS
 label: Customizing CSS
-order: 60
+order: 80
 desc: Customize the Payload Admin Panel further by adding your own CSS or SCSS style sheet to the configuration, powerful theme and design options are waiting for you.
 keywords: admin, css, scss, documentation, Content Management System, cms, headless, javascript, node, react, nextjs
 ---
@@ -32,6 +32,14 @@ Here is an example of how you might target the Dashboard View and change the bac
   <strong>Note:</strong>
   If you are building [Custom Components](./overview), it is best to import your own stylesheets directly into your components, rather than using the global stylesheet. You can continue to use the [CSS library](#css-library) as needed.
 </Banner>
+
+## Re-using Payload SCSS variables and utilities
+
+You can re-use Payload's SCSS variables and utilities in your own stylesheets by importing it from the UI package.
+
+```scss
+@import '~@payloadcms/ui/scss';
+```
 
 ## CSS Library
 

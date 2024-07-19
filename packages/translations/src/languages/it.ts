@@ -18,6 +18,7 @@ export const itTranslations: DefaultTranslationsObject = {
     confirmPassword: 'Conferma Password',
     createFirstUser: 'Crea il primo utente',
     emailNotValid: "L'email fornita non è valida",
+    emailOrUsername: 'Email o Nome utente',
     emailSent: 'Email Inviata',
     emailVerified: 'Email verificata con successo.',
     enableAPIKey: 'Abilita la Chiave API',
@@ -298,6 +299,7 @@ export const itTranslations: DefaultTranslationsObject = {
     updating: 'Aggiornamento',
     uploading: 'Caricamento',
     user: 'Utente',
+    username: 'Nome utente',
     users: 'Utenti',
     value: 'Valore',
     welcome: 'Benvenuto',
@@ -319,6 +321,7 @@ export const itTranslations: DefaultTranslationsObject = {
     within: "all'interno",
   },
   upload: {
+    addFile: 'Aggiungi file',
     crop: 'Raccolto',
     cropToolDescription:
       "Trascina gli angoli dell'area selezionata, disegna una nuova area o regola i valori qui sotto.",
@@ -333,6 +336,7 @@ export const itTranslations: DefaultTranslationsObject = {
     height: 'Altezza',
     lessInfo: 'Meno info',
     moreInfo: 'Più info',
+    pasteURL: 'Incolla URL',
     previewSizes: 'Anteprime Dimensioni',
     selectCollectionToBrowse: 'Seleziona una Collezione da Sfogliare',
     selectFile: 'Seleziona un file',
@@ -362,6 +366,8 @@ export const itTranslations: DefaultTranslationsObject = {
     shorterThanMax:
       'Questo valore deve essere inferiore alla lunghezza massima di {{maxLength}} caratteri.',
     trueOrFalse: "Questo campo può essere solo uguale a 'true' o 'false'.",
+    username:
+      'Inserisci un nome utente valido. Può contenere lettere, numeri, trattini, punti e underscore.',
     validUploadID: "'Questo campo non è un ID di Upload valido.'",
   },
   version: {
@@ -386,12 +392,15 @@ export const itTranslations: DefaultTranslationsObject = {
     confirmUnpublish: 'Conferma annullamento della pubblicazione',
     confirmVersionRestoration: 'Conferma il ripristino della versione',
     currentDocumentStatus: 'Documento {{docStatus}} corrente',
+    currentDraft: 'Bozza Corrente',
+    currentPublishedVersion: 'Versione Pubblicata Attuale',
     draft: 'Bozza',
     draftSavedSuccessfully: 'Bozza salvata con successo.',
     lastSavedAgo: 'Ultimo salvataggio {{distance}} fa',
     noFurtherVersionsFound: 'Non sono state trovate ulteriori versioni',
     noRowsFound: 'Nessun {{label}} trovato',
     preview: 'Anteprima',
+    previouslyPublished: 'Precedentemente Pubblicato',
     problemRestoringVersion: 'Si è verificato un problema durante il ripristino di questa versione',
     publish: 'Pubblicare',
     publishChanges: 'Pubblica modifiche',

@@ -18,6 +18,7 @@ export const roTranslations: DefaultTranslationsObject = {
     confirmPassword: 'Confirmați parola',
     createFirstUser: 'Creați primul utilizator',
     emailNotValid: 'Emailul furnizat nu este valid',
+    emailOrUsername: 'Email sau Nume de utilizator',
     emailSent: 'Email trimis',
     emailVerified: 'E-mail verificat cu succes.',
     enableAPIKey: 'Activați cheia API',
@@ -300,6 +301,7 @@ export const roTranslations: DefaultTranslationsObject = {
     updating: 'Actualizare',
     uploading: 'Încărcare',
     user: 'Utilizator',
+    username: 'Nume de utilizator',
     users: 'Utilizatori',
     value: 'Valoare',
     welcome: 'Bine ați venit',
@@ -321,6 +323,7 @@ export const roTranslations: DefaultTranslationsObject = {
     within: 'înăuntru',
   },
   upload: {
+    addFile: 'Adaugă fișier',
     crop: 'Cultură',
     cropToolDescription:
       'Trageți colțurile zonei selectate, desenați o nouă zonă sau ajustați valorile de mai jos.',
@@ -335,6 +338,7 @@ export const roTranslations: DefaultTranslationsObject = {
     height: 'Înălțime',
     lessInfo: 'Mai puține informații',
     moreInfo: 'Mai multe informații',
+    pasteURL: 'Lipește URL',
     previewSizes: 'Dimensiuni Previzualizare',
     selectCollectionToBrowse: 'Selectați o colecție pentru navigare',
     selectFile: 'Selectați un fișier',
@@ -366,6 +370,8 @@ export const roTranslations: DefaultTranslationsObject = {
     shorterThanMax:
       'Această valoare trebuie să fie mai scurtă decât lungimea maximă de {{maxLength}} caractere.',
     trueOrFalse: 'Acest câmp poate fi doar egal cu true sau false.',
+    username:
+      'Vă rugăm să introduceți un nume de utilizator valid. Poate conține litere, numere, cratime, puncte și sublinieri.',
     validUploadID: 'Acest câmp nu este un ID de încărcare valid.',
   },
   version: {
@@ -391,12 +397,15 @@ export const roTranslations: DefaultTranslationsObject = {
     confirmUnpublish: 'Confirmați nepublicarea',
     confirmVersionRestoration: 'Confirmați restaurarea versiunii',
     currentDocumentStatus: 'Documentul {{docStatus}} curent',
+    currentDraft: 'Proiectul Actual',
+    currentPublishedVersion: 'Versiunea Publicată Curentă',
     draft: 'Proiect',
     draftSavedSuccessfully: 'Proiect salvat cu succes.',
     lastSavedAgo: 'Ultima salvare acum {{distance}}',
     noFurtherVersionsFound: 'Nu s-au găsit alte versiuni',
     noRowsFound: 'Nu s-a găsit niciun {{label}}',
     preview: 'Previzualizare',
+    previouslyPublished: 'Publicat anterior',
     problemRestoringVersion: 'A existat o problemă la restaurarea acestei versiuni',
     publish: 'Publicați',
     publishChanges: 'Publicați modificările',

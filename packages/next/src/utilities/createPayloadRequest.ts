@@ -2,7 +2,7 @@ import type { CustomPayloadRequestProperties, PayloadRequest, SanitizedConfig } 
 
 import { initI18n } from '@payloadcms/translations'
 import { executeAuthStrategies, getDataLoader, parseCookies } from 'payload'
-import qs from 'qs'
+import * as qs from 'qs-esm'
 import { URL } from 'url'
 
 import { sanitizeLocales } from './addLocalesToRequest.js'
@@ -47,15 +47,6 @@ export const createPayloadRequest = async ({
 
   let locale
   let fallbackLocale
-  if (config.localization) {
-    const locales = sanitizeLocales({
-      fallbackLocale: searchParams.get('fallback-locale'),
-      locale: searchParams.get('locale'),
-      localization: payload.config.localization,
-    })
-    locale = locales.locale
-    fallbackLocale = locales.fallbackLocale
-  }
 
   const overrideHttpMethod = request.headers.get('X-HTTP-Method-Override')
   const queryToParse = overrideHttpMethod === 'GET' ? await request.text() : urlProperties.search
@@ -67,6 +58,20 @@ export const createPayloadRequest = async ({
         ignoreQueryPrefix: true,
       })
     : {}
+
+  if (config.localization) {
+    const locales = sanitizeLocales({
+      fallbackLocale: searchParams.get('fallback-locale'),
+      locale: searchParams.get('locale'),
+      localization: payload.config.localization,
+    })
+    locale = locales.locale
+    fallbackLocale = locales.fallbackLocale
+
+    // Override if query params are present, in order to respect HTTP method override
+    if (query.locale) locale = query.locale
+    if (query?.['fallback-locale']) fallbackLocale = query['fallback-locale']
+  }
 
   const customRequest: CustomPayloadRequestProperties = {
     context: {},
