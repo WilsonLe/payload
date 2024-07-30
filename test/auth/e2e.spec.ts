@@ -12,8 +12,8 @@ import type { PayloadTestSDK } from '../helpers/sdk/index.js'
 import type { Config } from './payload-types.js'
 
 import {
-  ensureAutoLoginAndCompilationIsDone,
-  getAdminRoutes,
+  ensureCompilationIsDone,
+  getRoutes,
   initPageConsoleErrorCatch,
   saveDocAndAssert,
 } from '../helpers.js'
@@ -49,7 +49,7 @@ const createFirstUser = async ({
       routes: { createFirstUser: createFirstUserRoute },
     },
     routes: { admin: adminRoute },
-  } = getAdminRoutes({
+  } = getRoutes({
     customAdminRoutes,
     customRoutes,
   })
@@ -105,7 +105,7 @@ describe('auth', () => {
         enableAPIKey: true,
       },
     })
-    await ensureAutoLoginAndCompilationIsDone({ page, serverURL })
+    await ensureCompilationIsDone({ page, serverURL })
   })
 
   describe('authenticated users', () => {

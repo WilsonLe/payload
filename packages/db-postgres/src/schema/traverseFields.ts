@@ -1,8 +1,12 @@
-/* eslint-disable no-param-reassign */
 import type { Relation } from 'drizzle-orm'
 import type { IndexBuilder, PgColumnBuilder } from 'drizzle-orm/pg-core'
 import type { Field, TabAsField } from 'payload'
 
+import {
+  createTableName,
+  hasLocalesTable,
+  validateExistingBlockIsIdentical,
+} from '@payloadcms/drizzle'
 import { relations } from 'drizzle-orm'
 import {
   PgNumericBuilder,
@@ -26,13 +30,11 @@ import toSnakeCase from 'to-snake-case'
 import type { GenericColumns, IDType, PostgresAdapter } from '../types.js'
 import type { BaseExtraConfig, RelationMap } from './build.js'
 
-import { hasLocalesTable } from '../utilities/hasLocalesTable.js'
 import { buildTable } from './build.js'
 import { createIndex } from './createIndex.js'
-import { createTableName } from './createTableName.js'
 import { idToUUID } from './idToUUID.js'
 import { parentIDColumnMap } from './parentIDColumnMap.js'
-import { validateExistingBlockIsIdentical } from './validateExistingBlockIsIdentical.js'
+import { withDefault } from './withDefault.js'
 
 type Args = {
   adapter: PostgresAdapter
@@ -168,14 +170,14 @@ export const traverseFields = ({
             )
           }
         } else {
-          targetTable[fieldName] = varchar(columnName)
+          targetTable[fieldName] = withDefault(varchar(columnName), field)
         }
         break
       }
       case 'email':
       case 'code':
       case 'textarea': {
-        targetTable[fieldName] = varchar(columnName)
+        targetTable[fieldName] = withDefault(varchar(columnName), field)
         break
       }
 
@@ -197,23 +199,26 @@ export const traverseFields = ({
             )
           }
         } else {
-          targetTable[fieldName] = numeric(columnName)
+          targetTable[fieldName] = withDefault(numeric(columnName), field)
         }
         break
       }
 
       case 'richText':
       case 'json': {
-        targetTable[fieldName] = jsonb(columnName)
+        targetTable[fieldName] = withDefault(jsonb(columnName), field)
         break
       }
 
       case 'date': {
-        targetTable[fieldName] = timestamp(columnName, {
-          mode: 'string',
-          precision: 3,
-          withTimezone: true,
-        })
+        targetTable[fieldName] = withDefault(
+          timestamp(columnName, {
+            mode: 'string',
+            precision: 3,
+            withTimezone: true,
+          }),
+          field,
+        )
         break
       }
 
@@ -309,13 +314,13 @@ export const traverseFields = ({
             }),
           )
         } else {
-          targetTable[fieldName] = adapter.enums[enumName](fieldName)
+          targetTable[fieldName] = withDefault(adapter.enums[enumName](fieldName), field)
         }
         break
       }
 
       case 'checkbox': {
-        targetTable[fieldName] = boolean(columnName)
+        targetTable[fieldName] = withDefault(boolean(columnName), field)
         break
       }
 

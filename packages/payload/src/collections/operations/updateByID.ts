@@ -3,7 +3,7 @@ import type { DeepPartial } from 'ts-essentials'
 import httpStatus from 'http-status'
 
 import type { FindOneArgs } from '../../database/types.js'
-import type { CollectionSlug, GeneratedTypes } from '../../index.js'
+import type { CollectionSlug } from '../../index.js'
 import type { PayloadRequest } from '../../types/index.js'
 import type {
   Collection,
@@ -236,7 +236,7 @@ export const updateByIDOperation = async <TSlug extends CollectionSlug>(
     // beforeChange - Fields
     // /////////////////////////////////////
 
-    let result = await beforeChange<DataFromCollectionSlug<TSlug>>({
+    let result = await beforeChange({
       id,
       collection: collectionConfig,
       context: req.context,
@@ -341,7 +341,7 @@ export const updateByIDOperation = async <TSlug extends CollectionSlug>(
     // afterChange - Fields
     // /////////////////////////////////////
 
-    result = await afterChange<DataFromCollectionSlug<TSlug>>({
+    result = await afterChange({
       collection: collectionConfig,
       context: req.context,
       data,
