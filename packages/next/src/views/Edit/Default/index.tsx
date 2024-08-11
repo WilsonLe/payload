@@ -17,7 +17,7 @@ import {
 } from '@payloadcms/ui'
 import { formatAdminURL, getFormState } from '@payloadcms/ui/shared'
 import { useRouter, useSearchParams } from 'next/navigation.js'
-import React, { Fragment, useCallback } from 'react'
+import React, { Fragment, useCallback, useState } from 'react'
 
 import { LeaveWithoutSaving } from '../../../elements/LeaveWithoutSaving/index.js'
 import { Auth } from './Auth/index.js'
@@ -100,7 +100,21 @@ export const DefaultEditView: React.FC = () => {
       !(globalConfig?.versions?.drafts && globalConfig?.versions?.drafts?.autosave)) &&
     !disableLeaveWithoutSaving
 
-  const classes = [baseClass, id && `${baseClass}--is-editing`].filter(Boolean).join(' ')
+  const classes = [baseClass, id && `${baseClass}--is-editing`]
+
+  if (globalSlug) classes.push(`global-edit--${globalSlug}`)
+  if (collectionSlug) classes.push(`collection-edit--${collectionSlug}`)
+
+  const [schemaPath, setSchemaPath] = React.useState(entitySlug)
+  const [validateBeforeSubmit, setValidateBeforeSubmit] = useState(() => {
+    if (
+      operation === 'create' &&
+      collectionConfig.auth &&
+      !collectionConfig.auth.disableLocalStrategy
+    )
+      return true
+    return false
+  })
 
   const onSave = useCallback(
     (json) => {
@@ -158,7 +172,6 @@ export const DefaultEditView: React.FC = () => {
   const onChange: FormProps['onChange'][0] = useCallback(
     async ({ formState: prevFormState }) => {
       const docPreferences = await getDocPreferences()
-
       return getFormState({
         apiRoute,
         body: {
@@ -168,21 +181,21 @@ export const DefaultEditView: React.FC = () => {
           formState: prevFormState,
           globalSlug,
           operation,
-          schemaPath: entitySlug,
+          schemaPath,
         },
         serverURL,
       })
     },
-    [serverURL, apiRoute, id, operation, entitySlug, collectionSlug, globalSlug, getDocPreferences],
+    [apiRoute, collectionSlug, schemaPath, getDocPreferences, globalSlug, id, operation, serverURL],
   )
 
   return (
-    <main className={classes}>
+    <main className={classes.filter(Boolean).join(' ')}>
       <OperationProvider operation={operation}>
         <Form
           action={action}
           className={`${baseClass}__form`}
-          disableValidationOnSubmit
+          disableValidationOnSubmit={!validateBeforeSubmit}
           disabled={isInitializing || !hasSavePermission}
           initialState={!isInitializing && initialState}
           isInitializing={isInitializing}
@@ -231,6 +244,8 @@ export const DefaultEditView: React.FC = () => {
                       operation={operation}
                       readOnly={!hasSavePermission}
                       requirePassword={!id}
+                      setSchemaPath={setSchemaPath}
+                      setValidateBeforeSubmit={setValidateBeforeSubmit}
                       useAPIKey={auth.useAPIKey}
                       username={data?.username}
                       verify={auth.verify}
@@ -255,7 +270,7 @@ export const DefaultEditView: React.FC = () => {
             docPermissions={docPermissions}
             fieldMap={fieldMap}
             readOnly={!hasSavePermission}
-            schemaPath={entitySlug}
+            schemaPath={schemaPath}
           />
           {AfterDocument}
         </Form>

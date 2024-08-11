@@ -14,6 +14,7 @@ import {
 } from '@payloadcms/ui'
 import { EntityType, formatAdminURL, groupNavItems } from '@payloadcms/ui/shared'
 import LinkWithDefault from 'next/link.js'
+import { usePathname } from 'next/navigation.js'
 import React, { Fragment } from 'react'
 
 const baseClass = 'nav'
@@ -21,6 +22,7 @@ const baseClass = 'nav'
 export const DefaultNavClient: React.FC = () => {
   const { permissions } = useAuth()
   const { isEntityVisible } = useEntityVisibility()
+  const pathname = usePathname()
 
   const {
     collections,
@@ -84,18 +86,19 @@ export const DefaultNavClient: React.FC = () => {
                 LinkWithDefault) as typeof LinkWithDefault.default
 
               const LinkElement = Link || 'a'
+              const activeCollection = pathname.endsWith(href)
 
               return (
                 <LinkElement
-                  className={`${baseClass}__link`}
+                  className={[`${baseClass}__link`, activeCollection && `active`]
+                    .filter(Boolean)
+                    .join(' ')}
                   href={href}
                   id={id}
                   key={i}
                   tabIndex={!navOpen ? -1 : undefined}
                 >
-                  <span className={`${baseClass}__link-icon`}>
-                    <ChevronIcon direction="right" />
-                  </span>
+                  {activeCollection && <div className={`${baseClass}__link-indicator`} />}
                   <span className={`${baseClass}__link-label`}>{entityLabel}</span>
                 </LinkElement>
               )

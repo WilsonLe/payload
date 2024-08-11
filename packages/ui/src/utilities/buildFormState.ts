@@ -115,9 +115,23 @@ export const buildFormState = async ({ req }: { req: PayloadRequest }): Promise<
           depth: 0,
           limit: 1,
           where: {
-            key: {
-              equals: preferencesKey,
-            },
+            and: [
+              {
+                key: {
+                  equals: preferencesKey,
+                },
+              },
+              {
+                'user.relationTo': {
+                  equals: req.user.collection,
+                },
+              },
+              {
+                'user.value': {
+                  equals: req.user.id,
+                },
+              },
+            ],
           },
         })) as unknown as { docs: { value: DocumentPreferences }[] }
 
@@ -176,6 +190,7 @@ export const buildFormState = async ({ req }: { req: PayloadRequest }): Promise<
 
   const result = await buildStateFromSchema({
     id,
+    collectionSlug,
     data,
     fieldSchema,
     operation,
@@ -187,16 +202,6 @@ export const buildFormState = async ({ req }: { req: PayloadRequest }): Promise<
   if (collectionSlug && formState) {
     if (req.payload.collections[collectionSlug]?.config?.upload && formState.file) {
       result.file = formState.file
-    }
-
-    if (
-      req.payload.collections[collectionSlug]?.config?.auth &&
-      !req.payload.collections[collectionSlug].config.auth.disableLocalStrategy
-    ) {
-      if (formState.username) result.username = formState.username
-      if (formState.password) result.password = formState.password
-      if (formState['confirm-password']) result['confirm-password'] = formState['confirm-password']
-      if (formState.email) result.email = formState.email
     }
   }
 

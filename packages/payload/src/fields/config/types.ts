@@ -32,6 +32,10 @@ export type FieldHookArgs<TData extends TypeWithID = any, TValue = any, TSibling
   context: RequestContext
   /** The data passed to update the document within create and update operations, and the full document itself in the afterRead hook. */
   data?: Partial<TData>
+  /**
+   * Only available in the `afterRead` hook.
+   */
+  draft?: boolean
   /** The field which the hook is running against. */
   field: FieldAffectingData
   /** Boolean to denote if this hook is running against finding one, or finding many within the afterRead hook. */
@@ -59,6 +63,10 @@ export type FieldHookArgs<TData extends TypeWithID = any, TValue = any, TSibling
    * The schemaPath of the field, e.g. ["group", "myArray", "textField"]. The schemaPath is the path but without indexes and would be used in the context of field schemas, not field data.
    */
   schemaPath: string[]
+  /**
+   * Only available in the `afterRead` hook.
+   */
+  showHiddenFields?: boolean
   /** The sibling data passed to a field that the hook is running against. */
   siblingData: Partial<TSiblingData>
   /**
@@ -176,12 +184,14 @@ export type Labels = {
 }
 
 export type BaseValidateOptions<TData, TSiblingData, TValue> = {
+  collectionSlug?: string
   data: Partial<TData>
   id?: number | string
   operation?: Operation
   preferences: DocumentPreferences
   previousValue?: TValue
   req: PayloadRequest
+  required?: boolean
   siblingData: Partial<TSiblingData>
 }
 
@@ -201,8 +211,6 @@ export type Validate<
   value: TValue,
   options: ValidateOptions<TData, TSiblingData, TFieldConfig, TValue>,
 ) => Promise<string | true> | string | true
-
-export type ClientValidate = Omit<Validate, 'req'>
 
 export type OptionObject = {
   label: LabelFunction | LabelStatic
@@ -521,6 +529,7 @@ export type UploadField = {
       Label?: LabelComponent
     }
   }
+  displayPreview?: boolean
   filterOptions?: FilterOptions
   /**
    * Sets a maximum population depth for this field, regardless of the remaining depth when this field is reached.
