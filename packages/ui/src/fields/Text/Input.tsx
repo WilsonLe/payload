@@ -7,6 +7,7 @@ import React from 'react'
 import type { TextInputProps } from './types.js'
 
 import { ReactSelect } from '../../elements/ReactSelect/index.js'
+import { RenderComponent } from '../../providers/Config/RenderComponent.js'
 import { useTranslation } from '../../providers/Translation/index.js'
 import { FieldDescription } from '../FieldDescription/index.js'
 import { FieldError } from '../FieldError/index.js'
@@ -16,14 +17,16 @@ import './index.scss'
 
 export const TextInput: React.FC<TextInputProps> = (props) => {
   const {
-    AfterInput,
-    BeforeInput,
-    CustomDescription,
-    CustomError,
-    CustomLabel,
+    Description,
+    Error,
+    Label,
+    afterInput,
+    beforeInput,
     className,
+    description,
     descriptionProps,
     errorProps,
+    field,
     hasMany,
     inputRef,
     label,
@@ -63,14 +66,15 @@ export const TextInput: React.FC<TextInputProps> = (props) => {
       }}
     >
       <FieldLabel
-        CustomLabel={CustomLabel}
+        Label={Label}
+        field={field}
         label={label}
         required={required}
         {...(labelProps || {})}
       />
       <div className={`${fieldBaseClass}__wrap`}>
-        <FieldError CustomError={CustomError} path={path} {...(errorProps || {})} />
-        {BeforeInput}
+        <FieldError CustomError={Error} field={field} path={path} {...(errorProps || {})} />
+        <RenderComponent mappedComponent={beforeInput} />
         {hasMany ? (
           <ReactSelect
             className={`field-${path.replace(/\./g, '__')}`}
@@ -110,12 +114,13 @@ export const TextInput: React.FC<TextInputProps> = (props) => {
             value={value || ''}
           />
         )}
-        {AfterInput}
-        {CustomDescription !== undefined ? (
-          CustomDescription
-        ) : (
-          <FieldDescription {...(descriptionProps || {})} />
-        )}
+        <RenderComponent mappedComponent={afterInput} />
+        <FieldDescription
+          Description={Description}
+          description={description}
+          field={field}
+          {...(descriptionProps || {})}
+        />
       </div>
     </div>
   )

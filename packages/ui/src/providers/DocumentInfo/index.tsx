@@ -54,11 +54,13 @@ const DocumentInfo: React.FC<
   } = props
 
   const {
-    admin: { dateFormat },
-    collections,
-    globals,
-    routes: { api },
-    serverURL,
+    config: {
+      admin: { dateFormat },
+      collections,
+      globals,
+      routes: { api },
+      serverURL,
+    },
   } = useConfig()
 
   const collectionConfig = collections.find((c) => c.slug === collectionSlug)
@@ -556,6 +558,7 @@ const DocumentInfo: React.FC<
     isInitializing,
     isLoading,
     onSave,
+    preferencesKey,
     publishedDoc,
     setDocFieldPreferences,
     setDocumentTitle,

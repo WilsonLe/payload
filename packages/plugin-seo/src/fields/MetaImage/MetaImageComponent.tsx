@@ -1,6 +1,7 @@
 'use client'
 
-import type { FieldType, Options, UploadInputProps } from '@payloadcms/ui'
+import type { FieldType, Options } from '@payloadcms/ui'
+import type { UploadFieldProps } from 'payload'
 
 import {
   FieldLabel,
@@ -21,11 +22,22 @@ import type { GenerateImage } from '../../types.js'
 import { Pill } from '../../ui/Pill.js'
 
 type MetaImageProps = {
-  hasGenerateImageFn: boolean
-} & UploadInputProps
+  readonly hasGenerateImageFn: boolean
+} & UploadFieldProps
 
 export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
-  const { CustomLabel, hasGenerateImageFn, label, labelProps, relationTo, required } = props || {}
+  const {
+    field: {
+      admin: {
+        components: { Label },
+      },
+      label,
+      relationTo,
+      required,
+    },
+    hasGenerateImageFn,
+    labelProps,
+  } = props || {}
   const { path: pathFromContext } = useFieldProps()
 
   const field: FieldType<string> = useField({ ...props, path: pathFromContext } as Options)
@@ -43,10 +55,17 @@ export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
 
     const genImageResponse = await fetch('/api/plugin-seo/generate-image', {
       body: JSON.stringify({
-        ...docInfo,
-        doc: { ...getData() },
+        id: docInfo.id,
+        slug: docInfo.slug,
+        doc: getData(),
+        docPermissions: docInfo.docPermissions,
+        hasPublishPermission: docInfo.hasPublishPermission,
+        hasSavePermission: docInfo.hasSavePermission,
+        initialData: docInfo.initialData,
+        initialState: docInfo.initialState,
         locale: typeof locale === 'object' ? locale?.code : locale,
-      } satisfies Parameters<GenerateImage>[0]),
+        title: docInfo.title,
+      } satisfies Omit<Parameters<GenerateImage>[0], 'req'>),
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +80,7 @@ export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
 
   const hasImage = Boolean(value)
 
-  const config = useConfig()
+  const { config } = useConfig()
 
   const { collections, routes: { api } = {}, serverURL } = config
 
@@ -80,7 +99,7 @@ export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
         }}
       >
         <div className="plugin-seo__field">
-          <FieldLabel CustomLabel={CustomLabel} label={label} {...(labelProps || {})} />
+          <FieldLabel Label={Label} field={null} label={label} {...(labelProps || {})} />
           {hasGenerateImageFn && (
             <React.Fragment>
               &nbsp; &mdash; &nbsp;
@@ -121,7 +140,11 @@ export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
         }}
       >
         <UploadInput
-          CustomError={errorMessage}
+          Error={{
+            type: 'client',
+            Component: null,
+            RenderedComponent: errorMessage,
+          }}
           api={api}
           collection={collection}
           filterOptions={field.filterOptions}
@@ -134,6 +157,7 @@ export const MetaImageComponent: React.FC<MetaImageProps> = (props) => {
               setValue(null)
             }
           }}
+          path={field.path}
           relationTo={relationTo}
           required={required}
           serverURL={serverURL}

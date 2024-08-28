@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useReducer, useRef, useState } from 'rea
 import type { DocumentDrawerProps } from '../../elements/DocumentDrawer/types.js'
 import type { GetResults, Option, Value } from './types.js'
 
+import { AddNewRelation } from '../../elements/AddNewRelation/index.js'
 import { ReactSelect } from '../../elements/ReactSelect/index.js'
 import { useFieldProps } from '../../forms/FieldPropsProvider/index.js'
 import { useField } from '../../forms/useField/index.js'
@@ -21,7 +22,6 @@ import { FieldDescription } from '../FieldDescription/index.js'
 import { FieldError } from '../FieldError/index.js'
 import { FieldLabel } from '../FieldLabel/index.js'
 import { fieldBaseClass } from '../shared/index.js'
-import { AddNewRelation } from './AddNew/index.js'
 import { createRelationMap } from './createRelationMap.js'
 import { findOptionsByValue } from './findOptionsByValue.js'
 import './index.scss'
@@ -35,29 +35,34 @@ const baseClass = 'relationship'
 
 const RelationshipFieldComponent: React.FC<RelationshipFieldProps> = (props) => {
   const {
-    name,
-    CustomDescription,
-    CustomError,
-    CustomLabel,
-    allowCreate = true,
-    className,
     descriptionProps,
     errorProps,
-    hasMany,
-    isSortable = true,
-    label,
+    field,
+    field: {
+      name,
+      _path: pathFromProps,
+      admin: {
+        allowCreate = true,
+        className,
+        description,
+        isSortable = true,
+        readOnly: readOnlyFromAdmin,
+        sortOptions,
+        style,
+        width,
+      } = {},
+      hasMany,
+      label,
+      relationTo,
+      required,
+    },
     labelProps,
-    path: pathFromProps,
-    readOnly: readOnlyFromProps,
-    relationTo,
-    required,
-    sortOptions,
-    style,
+    readOnly: readOnlyFromTopLevelProps,
     validate,
-    width,
   } = props
+  const readOnlyFromProps = readOnlyFromTopLevelProps || readOnlyFromAdmin
 
-  const config = useConfig()
+  const { config } = useConfig()
 
   const {
     collections,
@@ -483,14 +488,19 @@ const RelationshipFieldComponent: React.FC<RelationshipFieldProps> = (props) => 
       }}
     >
       <FieldLabel
-        CustomLabel={CustomLabel}
+        Label={field?.admin?.components?.Label}
+        field={field}
         label={label}
         required={required}
         {...(labelProps || {})}
       />
       <div className={`${fieldBaseClass}__wrap`}>
-        <FieldError CustomError={CustomError} path={path} {...(errorProps || {})} />
-
+        <FieldError
+          CustomError={field?.admin?.components?.Error}
+          field={field}
+          path={path}
+          {...(errorProps || {})}
+        />
         {!errorLoading && (
           <div className={`${baseClass}__wrap`}>
             <ReactSelect
@@ -581,25 +591,22 @@ const RelationshipFieldComponent: React.FC<RelationshipFieldProps> = (props) => 
             />
             {!readOnly && allowCreate && (
               <AddNewRelation
-                {...{
-                  dispatchOptions,
-                  hasMany,
-                  options,
-                  path,
-                  relationTo,
-                  setValue,
-                  value,
-                }}
+                hasMany={hasMany}
+                path={path}
+                relationTo={relationTo}
+                setValue={setValue}
+                value={value}
               />
             )}
           </div>
         )}
         {errorLoading && <div className={`${baseClass}__error-loading`}>{errorLoading}</div>}
-        {CustomDescription !== undefined ? (
-          CustomDescription
-        ) : (
-          <FieldDescription {...(descriptionProps || {})} />
-        )}
+        <FieldDescription
+          Description={field?.admin?.components?.Description}
+          description={description}
+          field={field}
+          {...(descriptionProps || {})}
+        />
       </div>
     </div>
   )

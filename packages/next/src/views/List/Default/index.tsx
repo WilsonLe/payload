@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 'use client'
 
-import type { CollectionComponentMap } from '@payloadcms/ui/utilities/buildComponentMap'
+import type { ClientCollectionConfig } from 'payload'
 
 import { getTranslation } from '@payloadcms/translations'
 import {
@@ -10,22 +9,26 @@ import {
   EditMany,
   Gutter,
   ListControls,
+  ListHeader,
   ListSelection,
   Pagination,
   PerPage,
-  Pill,
   PublishMany,
   RelationshipProvider,
+  RenderComponent,
   SelectionProvider,
   SetViewActions,
   StaggeredShimmers,
   Table,
   UnpublishMany,
-  useComponentMap,
+  ViewDescription,
+  useBulkUpload,
   useConfig,
   useEditDepth,
   useListInfo,
   useListQuery,
+  useModal,
+  useRouteCache,
   useSearchParams,
   useStepNav,
   useTranslation,
@@ -41,33 +44,46 @@ const baseClass = 'collection-list'
 const Link = (LinkImport.default || LinkImport) as unknown as typeof LinkImport.default
 
 export const DefaultListView: React.FC = () => {
-  const { Header, collectionSlug, hasCreatePermission, newDocumentURL } = useListInfo()
+  const {
+    Header,
+    beforeActions,
+    collectionSlug,
+    disableBulkDelete,
+    disableBulkEdit,
+    hasCreatePermission,
+    newDocumentURL,
+  } = useListInfo()
+
   const { data, defaultLimit, handlePageChange, handlePerPageChange } = useListQuery()
   const { searchParams } = useSearchParams()
+  const { openModal } = useModal()
+  const { clearRouteCache } = useRouteCache()
+  const { setCollectionSlug, setOnSuccess } = useBulkUpload()
+  const { drawerSlug } = useBulkUpload()
 
-  const config = useConfig()
+  const { getEntityConfig } = useConfig()
 
-  const { getComponentMap } = useComponentMap()
-
-  const componentMap = getComponentMap({ collectionSlug }) as CollectionComponentMap
+  const collectionConfig = getEntityConfig({ collectionSlug }) as ClientCollectionConfig
 
   const {
-    AfterList,
-    AfterListTable,
-    BeforeList,
-    BeforeListTable,
-    Description,
-    actionsMap,
-    fieldMap,
-  } = componentMap || {}
+    admin: {
+      components: {
+        Description,
+        afterList,
+        afterListTable,
+        beforeList,
+        beforeListTable,
+        views: {
+          list: { actions },
+        },
+      },
+      description,
+    },
+    fields,
+    labels,
+  } = collectionConfig
 
-  const collectionConfig = config.collections.find(
-    (collection) => collection.slug === collectionSlug,
-  )
-
-  const { labels } = collectionConfig
-
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
 
   const drawerDepth = useEditDepth()
 
@@ -79,7 +95,9 @@ export const DefaultListView: React.FC = () => {
 
   let docs = data.docs || []
 
-  if (collectionConfig.upload) {
+  const isUploadCollection = Boolean(collectionConfig.upload)
+
+  if (isUploadCollection) {
     docs = docs?.map((doc) => {
       return {
         ...doc,
@@ -87,6 +105,12 @@ export const DefaultListView: React.FC = () => {
       }
     })
   }
+
+  const openBulkUpload = React.useCallback(() => {
+    setCollectionSlug(collectionSlug)
+    openModal(drawerSlug)
+    setOnSuccess(clearRouteCache)
+  }, [clearRouteCache, collectionSlug, drawerSlug, openModal, setCollectionSlug, setOnSuccess])
 
   useEffect(() => {
     if (drawerDepth <= 1) {
@@ -98,37 +122,55 @@ export const DefaultListView: React.FC = () => {
     }
   }, [setStepNav, labels, drawerDepth])
 
+  const isBulkUploadEnabled = isUploadCollection && collectionConfig.upload.bulkUpload
+
   return (
     <div className={`${baseClass} ${baseClass}--${collectionSlug}`}>
-      <SetViewActions actions={actionsMap?.List} />
-      {BeforeList}
+      <SetViewActions actions={actions} />
+      <RenderComponent mappedComponent={beforeList} />
       <SelectionProvider docs={data.docs} totalDocs={data.totalDocs}>
         <Gutter className={`${baseClass}__wrap`}>
-          <header className={`${baseClass}__header`}>
-            {Header || (
-              <Fragment>
-                <h1>{getTranslation(labels?.plural, i18n)}</h1>
-                {hasCreatePermission && (
-                  <Pill
+          {Header || (
+            <ListHeader heading={getTranslation(labels?.plural, i18n)}>
+              {hasCreatePermission && (
+                <>
+                  <Button
+                    Link={Link}
                     aria-label={i18n.t('general:createNewLabel', {
                       label: getTranslation(labels?.singular, i18n),
                     })}
+                    buttonStyle="pill"
+                    el={'link'}
+                    size="small"
                     to={newDocumentURL}
                   >
                     {i18n.t('general:createNew')}
-                  </Pill>
-                )}
-                {!smallBreak && (
-                  <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
-                )}
-                {Description ? (
-                  <div className={`${baseClass}__sub-header`}>{Description}</div>
-                ) : null}
-              </Fragment>
-            )}
-          </header>
-          <ListControls collectionConfig={collectionConfig} fieldMap={fieldMap} />
-          {BeforeListTable}
+                  </Button>
+
+                  {isBulkUploadEnabled && (
+                    <Button
+                      aria-label={t('upload:bulkUpload')}
+                      buttonStyle="pill"
+                      onClick={openBulkUpload}
+                      size="small"
+                    >
+                      {t('upload:bulkUpload')}
+                    </Button>
+                  )}
+                </>
+              )}
+              {!smallBreak && (
+                <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
+              )}
+              {(description || Description) && (
+                <div className={`${baseClass}__sub-header`}>
+                  <ViewDescription Description={Description} description={description} />
+                </div>
+              )}
+            </ListHeader>
+          )}
+          <ListControls collectionConfig={collectionConfig} fields={fields} />
+          <RenderComponent mappedComponent={beforeListTable} />
           {!data.docs && (
             <StaggeredShimmers
               className={[`${baseClass}__shimmer`, `${baseClass}__shimmer--rows`].join(' ')}
@@ -143,7 +185,7 @@ export const DefaultListView: React.FC = () => {
                   uploadConfig: collectionConfig.upload,
                 }}
                 data={docs}
-                fieldMap={fieldMap}
+                fields={fields}
               />
             </RelationshipProvider>
           )}
@@ -159,7 +201,7 @@ export const DefaultListView: React.FC = () => {
               )}
             </div>
           )}
-          {AfterListTable}
+          <RenderComponent mappedComponent={afterListTable} />
           {data.docs && data.docs.length > 0 && (
             <div className={`${baseClass}__page-controls`}>
               <Pagination
@@ -168,7 +210,7 @@ export const DefaultListView: React.FC = () => {
                 limit={data.limit}
                 nextPage={data.nextPage}
                 numberOfNeighbors={1}
-                onChange={handlePageChange}
+                onChange={(page) => void handlePageChange(page)}
                 page={data.page}
                 prevPage={data.prevPage}
                 totalPages={data.totalPages}
@@ -183,7 +225,7 @@ export const DefaultListView: React.FC = () => {
                     {i18n.t('general:of')} {data.totalDocs}
                   </div>
                   <PerPage
-                    handleChange={handlePerPageChange}
+                    handleChange={(limit) => void handlePerPageChange(limit)}
                     limit={
                       isNumber(searchParams?.limit) ? Number(searchParams.limit) : defaultLimit
                     }
@@ -194,10 +236,15 @@ export const DefaultListView: React.FC = () => {
                     <div className={`${baseClass}__list-selection`}>
                       <ListSelection label={getTranslation(collectionConfig.labels.plural, i18n)} />
                       <div className={`${baseClass}__list-selection-actions`}>
-                        <EditMany collection={collectionConfig} fieldMap={fieldMap} />
-                        <PublishMany collection={collectionConfig} />
-                        <UnpublishMany collection={collectionConfig} />
-                        <DeleteMany collection={collectionConfig} />
+                        {beforeActions && beforeActions}
+                        {!disableBulkEdit && (
+                          <Fragment>
+                            <EditMany collection={collectionConfig} fields={fields} />
+                            <PublishMany collection={collectionConfig} />
+                            <UnpublishMany collection={collectionConfig} />
+                          </Fragment>
+                        )}
+                        {!disableBulkDelete && <DeleteMany collection={collectionConfig} />}
                       </div>
                     </div>
                   )}
@@ -207,7 +254,7 @@ export const DefaultListView: React.FC = () => {
           )}
         </Gutter>
       </SelectionProvider>
-      {AfterList}
+      <RenderComponent mappedComponent={afterList} />
     </div>
   )
 }
